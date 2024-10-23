@@ -66,12 +66,13 @@ function App() {
           else{
             setErrorMsg(`Revisit the syllables (${count}) of your haiku, bub. Need ${map_line_vowels[currentLine]}`)
             if(currentLine === 4){
-              setErrorMsg('Haiku complete!')
+              setErrorMsg('Haiku complete! Disable checks to continue.')
             }
           }
         }
         else{
           setHaiku([...haiku, text])
+          setText('')
         }
     }
   }
