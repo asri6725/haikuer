@@ -112,6 +112,7 @@ function App() {
                             }
                             else{
                               setDisableChecks(true)
+                              setErrorMsg('')
                               setDisableChecksButtonText("Re-enable checks")
                             }
                             console.log(disableChecks)
