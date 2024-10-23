@@ -3,22 +3,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import '@mantine/core/styles.css'
 import { MantineProvider, TextInput, Button, Container, Space } from '@mantine/core'
-
-function checkHaiku(lower_text){
-  let current_count = 0
-  const vowels = ['a', 'e', 'i', 'o', 'u']
-  for (let idx in lower_text) {
-    if (vowels.includes(lower_text[idx])){
-      if(vowels.includes(lower_text[idx-1]) && idx > 1){
-        continue
-      }
-      current_count += 1
-    }
-  }
-
-  return current_count
-}
-
+import { syllable } from 'syllable'
 
 function App() {
   const [text, setText] = useState('')
@@ -27,8 +12,11 @@ function App() {
   const canvasRef = useRef(null)
 
   const [disableChecks, setDisableChecks] = useState(false)
+  const [disableChecksButtonText, setDisableChecksButtonText] = useState('Disable checks')
 
   const [errorMsg, setErrorMsg] = useState('')
+
+  const map_line_vowels = {1:5, 2:7, 3:5, 4:'no more'}
 
   // Function to draw the haiku on the canvas
   const drawHaiku = () => {
@@ -56,7 +44,7 @@ function App() {
   const addLine = () => {
       if(text.trim()){
         if(!disableChecks){
-          let count = checkHaiku(text.toLocaleLowerCase())
+          let count = syllable(text.toLocaleLowerCase())
           if(currentLine === 1 && count == 5){
             setCurrentLine(2)
             setHaiku([...haiku, text])
@@ -70,13 +58,14 @@ function App() {
             setErrorMsg('')
           }
           else if(currentLine === 3 && count == 5){
+            setCurrentLine(4)
             setHaiku([...haiku, text])
             setText('')
             setErrorMsg('')
           }
           else{
-            setErrorMsg(`Revisit the syllables (${count}) of your haiku, bub!`)
-            if(currentLine === 3){
+            setErrorMsg(`Revisit the syllables (${count}) of your haiku, bub. Need ${map_line_vowels[currentLine]}`)
+            if(currentLine === 4){
               setErrorMsg('Haiku complete!')
             }
           }
@@ -91,6 +80,7 @@ function App() {
     setText('');
     setHaiku([])
     setCurrentLine(1)
+    setErrorMsg('')
   }
 
   return (
@@ -100,18 +90,37 @@ function App() {
         <Space h="md" />
         <TextInput
           value={text}
-          onChange={(event) => setText(event.target.value)}
           placeholder="Enter a line of your haiku"
           description={errorMsg}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if(event.key === 'Enter'){
+              addLine();
+            }
+          }}
         />
         <Space h="md" />
         <Container className='buttons-class'>
-          <Button onClick={addLine}>Add Line to Haiku</Button>  
-          <Space w="s" />
-          <Button onClick= {cleanSlate}>Clean Slate</Button>
-          <br/>
-          <Button onClick= {() => {setDisableChecks(true)}}>Disable checks and set me free</Button>
+          <Button onClick={addLine} className='button-class'>Add Line</Button>  
+          <Space w="md" />
+          <Button className='button-class'
+          onClick= {() => {
+                            if(disableChecks == true){
+                              setDisableChecks(false)
+                              setDisableChecksButtonText('Disable checks')
+                            }
+                            else{
+                              setDisableChecks(true)
+                              setDisableChecksButtonText("Re-enable checks")
+                            }
+                            console.log(disableChecks)
+                          }
+                        }
+          >{disableChecksButtonText}</Button>
+
         </Container>
+        <Space h="md" />
+        <Button onClick= {cleanSlate}>Clean Slate</Button>
       </Container>
     </MantineProvider>
   )
