@@ -1,4 +1,4 @@
-from flask import Flask, request  # Import request here
+from flask import Flask, request
 from flask_socketio import SocketIO, send, join_room, leave_room
 import uuid
 
