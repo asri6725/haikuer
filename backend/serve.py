@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_socketio import SocketIO, send, join_room, leave_room
+from flask_socketio import SocketIO, join_room, leave_room
 import uuid
 
 app = Flask(__name__)
@@ -25,25 +25,32 @@ def handle_join(data):
 
     if room in rooms and rooms[room]['password'] == password:
         join_room(room)
-        send(f"{username} has joined the room.", to=room)
+        socketio.emit('room_joined', {'room_id': room, 'message': f"{username} has joined."}, to=room)
     else:
-        send('Incorrect room ID or password.', room=request.sid)
+        socketio.emit('message', {'message': 'Incorrect room ID or password.'}, to=request.sid)
 
-@socketio.on('message')
+@socketio.on('new_line')
 def handle_message(data):
     room = data['room']
-    message = data['message']
+    message = data['haiku']
 
     if room in rooms:
-        rooms[room]['messages'].append(message)
-        send(message, to=room)  # Send the message to the specific room
+        rooms[room]['messages']= message
+        socketio.emit('new_line', {'haiku': message}, to=room)
+
+@socketio.on('clean_slate')
+def handle_message(data):
+    room = data['room']
+
+    if room in rooms:
+        socketio.emit('clean_slate', to=room)
 
 @socketio.on('leave')
 def handle_leave(data):
     username = data['username']
     room = data['room']
     leave_room(room)
-    send(f"{username} has left the room.", to=room)
+    socketio.emit('room_joined', {'message': f"{username} has left."}, to=room)
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)

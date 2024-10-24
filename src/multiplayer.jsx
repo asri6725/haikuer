@@ -1,33 +1,43 @@
 import React, { useState, useEffect } from 'react'
 
-function Multiplayer({ addLine, setRoomMode }) {
+function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, roomId }) {
   const [username, setUsername] = useState('')
-  const [message, setMessage] = useState('')
-  const [chat, setChat] = useState([])
   const [roomPassword, setRoomPassword] = useState('')
-  const [roomId, setRoomId] = useState('')
   const [isInRoom, setIsInRoom] = useState(false)
+  const [roomStatus, setRoomStatus] = useState([])
 
   useEffect(() => {
-    // Listen for messages from the server
-    socket.on('message', (msg) => {
-      setChat((prevChat) => [...prevChat, msg])
-    })
-
     // Room creation response
     socket.on('room_created', (data) => {
       setRoomId(data.room_id)
       alert('Room created successfully!')
     })
 
+    // Room join response
+    socket.on('room_joined', (data) => {
+      if(!isInRoom){
+        setRoomId(data.room_id)
+        setIsInRoom(true)
+        setRoomMode(true)
+      }
+      setRoomStatus((prevStatus) => [...prevStatus, data.message])
+    })
+
     socket.on('new_line', (data) => {
-      addLine(data.haiku)
+      updateHaiku(data.haiku)
+    })
+
+    socket.on('clean_slate', (data) => {
+      cleanSlate(data.haiku)
     })
 
     // Clean up the listener when the component unmounts
     return () => {
       socket.off('message')
       socket.off('room_created')
+      socket.off('room_joined')
+      socket.off('new_line')
+      socket.off('clean_slate')
     }
   }, [])
 
@@ -40,15 +50,6 @@ function Multiplayer({ addLine, setRoomMode }) {
   const joinRoom = () => {
     if (roomId && roomPassword && username) {
       socket.emit('join', { username, room: roomId, password: roomPassword })
-      setIsInRoom(true)
-      setRoomMode(true)
-    }
-  }
-
-  const sendMessage = () => {
-    if (message && roomId) {
-      socket.emit('message', { room: roomId, message })
-      setMessage('')
     }
   }
 
@@ -84,17 +85,10 @@ function Multiplayer({ addLine, setRoomMode }) {
       {isInRoom && (
         <div>
           <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
-            {chat.map((msg, index) => (
+            {roomStatus.map((msg, index) => (
               <div key={index}>{msg}</div>
             ))}
           </div>
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type your message"
-          />
-          <button onClick={sendMessage}>Send</button>
         </div>
       )}
     </div>
