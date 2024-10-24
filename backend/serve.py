@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request  # Import request here
 from flask_socketio import SocketIO, send, join_room, leave_room
 import uuid
 
@@ -14,7 +14,8 @@ def create_room(data):
     room_id = str(uuid.uuid4())
     password = data['password']
     rooms[room_id] = {'password': password, 'messages': []}
-    send({'room_id': room_id, 'message': 'Room created successfully!'}, room=request.sid)
+    socketio.emit('room_created', {'room_id': room_id, 'message': 'Room created successfully!'}, room=request.sid)
+
 
 @socketio.on('join')
 def handle_join(data):
