@@ -4,6 +4,11 @@ import './App.css'
 import '@mantine/core/styles.css'
 import { MantineProvider, TextInput, Button, Container, Space } from '@mantine/core'
 import { syllable } from 'syllable'
+import Multiplayer from './multiplayer.jsx'
+
+import io from 'socket.io-client'
+
+const socket = io('http://localhost:5000')
 
 function App() {
   const [text, setText] = useState('')
@@ -17,6 +22,10 @@ function App() {
   const [errorMsg, setErrorMsg] = useState('')
 
   const map_line_vowels = {1:5, 2:7, 3:5, 4:'no more'}
+
+  // socket stuff
+
+  const [roomMode, setRoomMode] = useState(false)
 
   // Function to draw the haiku on the canvas
   const drawHaiku = () => {
@@ -46,18 +55,21 @@ function App() {
         if(!disableChecks){
           let count = syllable(text.toLocaleLowerCase())
           if(currentLine === 1 && count == 5){
+            outgoingHaiku(text)
             setCurrentLine(2)
             setHaiku([...haiku, text])
             setText('')
             setErrorMsg('')
           }
           else if(currentLine === 2 && count == 7){
+            outgoingHaiku(text)
             setCurrentLine(3)
             setHaiku([...haiku, text])
             setText('')
             setErrorMsg('')
           }
           else if(currentLine === 3 && count == 5){
+            outgoingHaiku(text)
             setCurrentLine(4)
             setHaiku([...haiku, text])
             setText('')
@@ -78,14 +90,19 @@ function App() {
   }
 
   const cleanSlate = () => {
-    setText('');
+    setText('')
     setHaiku([])
     setCurrentLine(1)
     setErrorMsg('')
   }
 
+  const outgoingHaiku = (haiku) => {
+    socket.emit('new_line', { haiku: haiku })
+  }
+
   return (
     <MantineProvider>
+      {roomMode ? <p>You're in a room with another person.</p>:<></>}
       <Container className='container-class'>
         <canvas ref={canvasRef} width={400} height={300} style={{ }}></canvas>
         <Space h="md" />
@@ -96,7 +113,7 @@ function App() {
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
             if(event.key === 'Enter'){
-              addLine();
+              addLine()
             }
           }}
         />
@@ -124,6 +141,7 @@ function App() {
         <Space h="md" />
         <Button onClick= {cleanSlate}>Clean Slate</Button>
       </Container>
+      <Multiplayer addLine={addLine} setRoomMode={setRoomMode} socket = {socket}/>
     </MantineProvider>
   )
 }

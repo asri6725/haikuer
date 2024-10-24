@@ -1,58 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import React, { useState, useEffect } from 'react'
 
-const socket = io('http://localhost:5000');
-
-function Multiplayer() {
-  const [username, setUsername] = useState('');
-  const [message, setMessage] = useState('');
-  const [chat, setChat] = useState([]);
-  const [roomPassword, setRoomPassword] = useState('');
-  const [roomId, setRoomId] = useState('');
-  const [isInRoom, setIsInRoom] = useState(false);
+function Multiplayer({ addLine, setRoomMode }) {
+  const [username, setUsername] = useState('')
+  const [message, setMessage] = useState('')
+  const [chat, setChat] = useState([])
+  const [roomPassword, setRoomPassword] = useState('')
+  const [roomId, setRoomId] = useState('')
+  const [isInRoom, setIsInRoom] = useState(false)
 
   useEffect(() => {
     // Listen for messages from the server
     socket.on('message', (msg) => {
-      setChat((prevChat) => [...prevChat, msg]);
-    });
+      setChat((prevChat) => [...prevChat, msg])
+    })
 
     // Room creation response
     socket.on('room_created', (data) => {
-      setRoomId(data.room_id);
-      alert('Room created successfully!');
-    });
+      setRoomId(data.room_id)
+      alert('Room created successfully!')
+    })
+
+    socket.on('new_line', (data) => {
+      addLine(data.haiku)
+    })
 
     // Clean up the listener when the component unmounts
     return () => {
-      socket.off('message');
-      socket.off('room_created');
-    };
-  }, []);
+      socket.off('message')
+      socket.off('room_created')
+    }
+  }, [])
 
   const createRoom = () => {
     if (roomPassword) {
-      socket.emit('create_room', { password: roomPassword });
+      socket.emit('create_room', { password: roomPassword })
     }
-  };
+  }
 
   const joinRoom = () => {
     if (roomId && roomPassword && username) {
-      socket.emit('join', { username, room: roomId, password: roomPassword });
-      setIsInRoom(true);
+      socket.emit('join', { username, room: roomId, password: roomPassword })
+      setIsInRoom(true)
+      setRoomMode(true)
     }
-  };
+  }
 
   const sendMessage = () => {
     if (message && roomId) {
-      socket.emit('message', { room: roomId, message });
-      setMessage('');
+      socket.emit('message', { room: roomId, message })
+      setMessage('')
     }
-  };
+  }
+
+  // const otherHaiku = ()
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>Chat Room</h1>
       {!isInRoom && (
         <div>
           <h3>Create or Join a Room</h3>
@@ -95,7 +98,7 @@ function Multiplayer() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default Multiplayer;
+export default Multiplayer
