@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { TextInput , Button, Title, Container, Space, Alert } from '@mantine/core'
+import { IconInfoCircle } from '@tabler/icons-react';
 
 function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, roomId }) {
   const [username, setUsername] = useState('')
@@ -24,11 +26,12 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
     })
 
     socket.on('new_line', (data) => {
-      updateHaiku(data.haiku)
+      console.log(data)
+      updateHaiku(data)
     })
 
-    socket.on('clean_slate', (data) => {
-      cleanSlate(data.haiku)
+    socket.on('clean_slate', () => {
+      cleanSlate()
     })
 
     // Clean up the listener when the component unmounts
@@ -56,34 +59,44 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
   // const otherHaiku = ()
 
   return (
-    <div style={{ padding: '20px' }}>
+    <Container className='container-class'>
       {!isInRoom && (
         <div>
-          <h3>Create or Join a Room</h3>
-          <input
+          <Title order={3}>Haike with someone</Title>
+          <TextInput 
             type="text"
             placeholder="Enter Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <input
+          <Space h="xs" />
+          <TextInput 
             type="text"
             placeholder="Enter Room Password"
             value={roomPassword}
             onChange={(e) => setRoomPassword(e.target.value)}
           />
-          <button onClick={createRoom}>Create Room</button>
-          <input
+          <Space h="sm" />
+          <Button onClick={createRoom}>Create Room</Button>
+          <Space h="md" />
+          <TextInput 
             type="text"
             placeholder="Enter Room ID to Join"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
-          <button onClick={joinRoom}>Join Room</button>
+          <Button onClick={joinRoom}>Join Room</Button>
         </div>
       )}
       {isInRoom && (
-        <div>
+        <div style={{width: '100%'}}>
+          {/* <Alert variant="light" color="grape" radius="lg" title="" icon={IconInfoCircle}>
+            Joined room: {roomId}, room_pw: {roomPassword}
+          </Alert> */}
+          <Alert variant="light" color="grape" radius="lg" title="Room Details">
+          room: {roomId}<br />room pw: {roomPassword}
+          </Alert>
+          <Space h="xs" />
           <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
             {roomStatus.map((msg, index) => (
               <div key={index}>{msg}</div>
@@ -91,7 +104,7 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
           </div>
         </div>
       )}
-    </div>
+    </Container>
   )
 }
 

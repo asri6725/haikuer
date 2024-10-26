@@ -8,12 +8,6 @@ import Multiplayer from './multiplayer.jsx'
 
 import io from 'socket.io-client'
 
-const theme={
-    headings: {
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
-    }
-  }
-
 const socket = io('http://localhost:5000')
 
 function App() {
@@ -36,19 +30,19 @@ function App() {
 
   // Function to draw the haiku on the canvas
   const drawHaiku = () => {
-      // const canvas = canvasRef.current
-      // const context = canvas.getContext('2d')
+      const canvas = canvasRef.current
+      const context = canvas.getContext('2d')
       
-      // // Clear the canvas before drawing
-      // context.clearRect(0, 0, canvas.width, canvas.height)
+      // Clear the canvas before drawing
+      context.clearRect(0, 0, canvas.width, canvas.height)
       
-      // context.font = '20px Arial'
-      // context.fillStyle = 'black'
+      context.font = '20px Arial'
+      context.fillStyle = 'black'
       
-      // // Draw each line of the haiku
-      // haiku.forEach((line, index) => {
-      // context.fillText(line, 10, 40 * (index + 1)) // Adjust line spacing
-      // })
+      // Draw each line of the haiku
+      haiku.forEach((line, index) => {
+      context.fillText(line, 10, 40 * (index + 1)) // Adjust line spacing
+      })
   }
 
   // Update the canvas whenever the haiku changes
@@ -62,40 +56,24 @@ function App() {
         if(!disableChecks){
           let count = syllable(text.toLocaleLowerCase())
           if(currentLine === 1 && count == 5){
-            if(roomMode){
-              outgoingHaiku(text)
-            }
-            else{
-              setHaiku([...haiku, text])
-              setCurrentLine(2)
-            }
+            roomMode ? outgoingHaiku(text) : setHaiku([...haiku, text])
+            setCurrentLine(2)
             setText('')
             setErrorMsg('')
           }
           else if(currentLine === 2 && count == 7){
-            if(roomMode){
-              outgoingHaiku(text)
-            }
-            else{
-              setHaiku([...haiku, text])
-              setCurrentLine(3)
-            }
+            roomMode ? outgoingHaiku(text) : setHaiku([...haiku, text])
+            setCurrentLine(3)
             setText('')
             setErrorMsg('')
           }
           else if(currentLine === 3 && count == 5){
-            if(roomMode){
-              outgoingHaiku(text)
-            }
-            else{
-              setHaiku([...haiku, text])
-              setCurrentLine(4)
-            }
+            roomMode ? outgoingHaiku(text) : setHaiku([...haiku, text])
+            setCurrentLine(4)
             setText('')
             setErrorMsg('')
           }
           else{
-            console.log(currentLine)
             setErrorMsg(`Revisit the syllables (${count}) of your haiku, bub. Need ${map_line_vowels[currentLine]}`)
             if(currentLine === 4){
               setErrorMsg('Haiku complete! Disable checks to continue.')
@@ -124,18 +102,14 @@ function App() {
   }
 
   const updateHaiku = (text) => {
-    text.haiku.forEach((line, index) => {
-      setHaiku([...haiku, line]) // Adjust line spacing
-      })
-      if (text.haiku.length < 5) {
-        setCurrentLine(text.haiku.length + 1);
-    }
+    setHaiku([...haiku, text])
   }
 
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider>
+      {roomMode ? <p>You're in room: {roomId}</p>:<></>}
       <Container className='container-class'>
-        <p>{haiku}</p>
+        <canvas ref={canvasRef} width={400} height={300} style={{ }}></canvas>
         <Space h="md" />
         <TextInput
           value={text}
@@ -172,6 +146,7 @@ function App() {
         <Space h="md" />
         <Button onClick= {cleanSlate}>Clean Slate</Button>
       </Container>
+        <Space h="md" />
       <Multiplayer updateHaiku={updateHaiku} setRoomMode={setRoomMode} socket = {socket} setRoomId={setRoomId} cleanSlate={cleanSlate} roomId={roomId}/>
     </MantineProvider>
   )
