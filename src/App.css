@@ -6,6 +6,7 @@
     display: flex;
     flex-direction: column;
     background-color: #fff;
+    border-radius: 2em;
 }
 
 .buttons-class{
@@ -15,4 +16,8 @@
 button{
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.container-class:focus-within {
+    border: 0.5px solid black;
 }

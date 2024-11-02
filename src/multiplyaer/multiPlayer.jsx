@@ -83,8 +83,8 @@ function MultiPlayer({roomId}){
   useEffect(() => {
 
     socket.on('new-line', (data) => {
-        console.log(data)
         setHaiku(data.haiku)
+        setCurrentLine(data.haiku.length)
       })
   
       socket.on('clean-slate', () => {

@@ -40,7 +40,6 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
 
   const createRoom = () => {
     if (roomPassword) {
-      console.log('creat')
       socket.emit('create-room', { password: roomPassword })
     }
   }
