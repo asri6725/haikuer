@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { TextInput , Button, Title, Container, Space, Alert } from '@mantine/core'
+import socket from './socketService'
 
-function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, roomId }) {
+function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
   const [username, setUsername] = useState('')
   const [roomPassword, setRoomPassword] = useState('')
   const [isInRoom, setIsInRoom] = useState(false)
@@ -8,27 +10,24 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
 
   useEffect(() => {
     // Room creation response
-    socket.on('room_created', (data) => {
+    socket.on('room-created', (data) => {
       setRoomId(data.room_id)
       alert('Room created successfully!')
     })
 
     // Room join response
-    socket.on('room_joined', (data) => {
+    socket.on('room-joined', (data) => {
       if(!isInRoom){
         setRoomId(data.room_id)
         setIsInRoom(true)
-        setRoomMode(true)
+        setIsMultiplayer(true)
       }
       setRoomStatus((prevStatus) => [...prevStatus, data.message])
     })
 
-    socket.on('new_line', (data) => {
-      updateHaiku(data.haiku)
-    })
-
-    socket.on('clean_slate', (data) => {
-      cleanSlate(data.haiku)
+    // other messages from server
+    socket.on('message', (data) => {
+      setRoomStatus((prevStatus) => [...prevStatus, data.message])
     })
 
     // Clean up the listener when the component unmounts
@@ -36,14 +35,13 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
       socket.off('message')
       socket.off('room_created')
       socket.off('room_joined')
-      socket.off('new_line')
-      socket.off('clean_slate')
     }
   }, [])
 
   const createRoom = () => {
     if (roomPassword) {
-      socket.emit('create_room', { password: roomPassword })
+      console.log('creat')
+      socket.emit('create-room', { password: roomPassword })
     }
   }
 
@@ -56,34 +54,44 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
   // const otherHaiku = ()
 
   return (
-    <div style={{ padding: '20px' }}>
+    <Container className='container-class'>
       {!isInRoom && (
         <div>
-          <h3>Create or Join a Room</h3>
-          <input
+          <Title order={3}>Haike with someone</Title>
+          <TextInput 
             type="text"
             placeholder="Enter Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <input
+          <Space h="xs" />
+          <TextInput 
             type="text"
             placeholder="Enter Room Password"
             value={roomPassword}
             onChange={(e) => setRoomPassword(e.target.value)}
           />
-          <button onClick={createRoom}>Create Room</button>
-          <input
+          <Space h="sm" />
+          <Button onClick={createRoom}>Create Room</Button>
+          <Space h="md" />
+          <TextInput 
             type="text"
             placeholder="Enter Room ID to Join"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
           />
-          <button onClick={joinRoom}>Join Room</button>
+          <Button onClick={joinRoom}>Join Room</Button>
         </div>
       )}
       {isInRoom && (
-        <div>
+        <div style={{width: '100%'}}>
+          {/* <Alert variant="light" color="grape" radius="lg" title="" icon={IconInfoCircle}>
+            Joined room: {roomId}, room_pw: {roomPassword}
+          </Alert> */}
+          <Alert variant="light" color="grape" radius="lg" title="Room Details">
+          room: {roomId}<br />room pw: {roomPassword}
+          </Alert>
+          <Space h="xs" />
           <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
             {roomStatus.map((msg, index) => (
               <div key={index}>{msg}</div>
@@ -91,8 +99,8 @@ function Multiplayer({ updateHaiku, setRoomMode, socket, setRoomId, cleanSlate, 
           </div>
         </div>
       )}
-    </div>
+    </Container>
   )
 }
 
-export default Multiplayer
+export default RoomInitialiser
