@@ -84,11 +84,14 @@ function MultiPlayer({roomId}){
 
     socket.on('new-line', (data) => {
         console.log(data)
-        updateHaiku(data.haiku)
+        setHaiku(data.haiku)
       })
   
       socket.on('clean-slate', () => {
-        servCleanSlate()
+        setText('')
+        setHaiku([])
+        setCurrentLine(1)
+        setErrorMsg('')
       })
   
       // Clean up the listener when the component unmounts
@@ -97,18 +100,6 @@ function MultiPlayer({roomId}){
         socket.off('clean-slate')
       }
     }, [])
-
-  const servCleanSlate = () => {
-    setText('')
-    setHaiku([])
-    setCurrentLine(1)
-    setErrorMsg('')
-  }
-
-  const updateHaiku = (text) => {
-    console.log(text)
-    setHaiku([...haiku, text])
-  }
 
   return (
     <Container className='container-class'>
