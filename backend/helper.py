@@ -2,8 +2,8 @@ import random
 
 def generate_room_name():
     # Lists of adjectives and animal names to combine
-    adjectives = ["Brave", "Clever", "Swift", "Mighty", "Gentle", "Curious", "Loyal", "Wild", "Bold", "Wise"]
-    animals = ["Tiger", "Elephant", "Panda", "Fox", "Eagle", "Wolf", "Dolphin", "Lion", "Hawk", "Leopard"]
+    adjectives = ['brave', 'clever', 'swift', 'mighty', 'gentle', 'curious', 'loyal', 'wild', 'bold', 'wise']
+    animals = ['tiger', 'elephant', 'panda', 'fox', 'eagle', 'wolf', 'dolphin', 'lion', 'hawk', 'leopard']
 
     # Select a random adjective and animal
     adjective = random.choice(adjectives)

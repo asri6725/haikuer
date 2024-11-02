@@ -84,7 +84,11 @@ function MultiPlayer({roomId}){
 
     socket.on('new-line', (data) => {
         setHaiku(data.haiku)
-        setCurrentLine(data.haiku.length)
+        let line = data.haiku.length + 1
+        if(disableChecks && line > 3)
+            line = 3
+
+        setCurrentLine(line)
       })
   
       socket.on('clean-slate', () => {
@@ -122,16 +126,15 @@ function MultiPlayer({roomId}){
             <Space w="md" />
             <Button className='button-class'
             onClick= {() => {
-                            if(disableChecks == true){
-                                setDisableChecks(false)
-                                setDisableChecksButtonText('Disable checks')
-                            }
-                            else{
-                                setDisableChecks(true)
-                                setErrorMsg('')
-                                setDisableChecksButtonText("Re-enable checks")
-                            }
-                            console.log(disableChecks)
+                                if(disableChecks == true){
+                                    setDisableChecks(false)
+                                    setDisableChecksButtonText('Disable checks')
+                                }
+                                else{
+                                    setDisableChecks(true)
+                                    setErrorMsg('')
+                                    setDisableChecksButtonText("Re-enable checks")
+                                }
                             }
                         }
             >{disableChecksButtonText}</Button>
@@ -139,7 +142,6 @@ function MultiPlayer({roomId}){
         </Container>
         <Space h="md" />
         <Button onClick= {cleanSlate}>Clean Slate</Button>
-        <p> Your room ID is: {roomId}</p>
     </Container>
   )
 }

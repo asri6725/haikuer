@@ -85,7 +85,7 @@ function SinglePlayer(){
 
   return (
     <Container className='container-class'>
-      <canvas ref={canvasRef} width={400} height={300} style={{ }}></canvas>
+      <canvas ref={canvasRef} className='canvas'></canvas>
       <Space h="md" />
       <TextInput
         value={text}
@@ -113,7 +113,6 @@ function SinglePlayer(){
                             setErrorMsg('')
                             setDisableChecksButtonText("Re-enable checks")
                           }
-                          console.log(disableChecks)
                         }
                       }
         >{disableChecksButtonText}</Button>
