@@ -10,6 +10,6 @@ def generate_room_name():
     animal = random.choice(animals)
 
     # Combine them to create the room name
-    room_name = f"{adjective}_{animal}"
+    room_name = f"{adjective}-{animal}"
     
     return room_name
