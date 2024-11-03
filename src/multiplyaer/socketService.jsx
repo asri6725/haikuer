@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://13.236.193.140:80');
 
 export function initializeSocket() {
   socket.connect();

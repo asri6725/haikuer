@@ -1,9 +1,13 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, leave_room
+from flask_cors import CORS
+
 from helper import generate_room_name
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins=["https://asri6725.github.io", "http://localhost:5173"])
+
+CORS(app, resources={r"/*": {"origins": ["https://asri6725.github.io", "http://localhost:5173"]}})
 
 # Store active rooms with their passwords
 rooms = {}
