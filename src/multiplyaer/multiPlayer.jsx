@@ -77,7 +77,7 @@ function MultiPlayer({roomId}){
   }
 
   const cleanSlate = () => {
-    socket.emit('clean-slate', roomId)
+    socket.emit('clean-slate', { room: roomId })
   }
 
   useEffect(() => {

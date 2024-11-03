@@ -68,7 +68,7 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
 
     navigator.clipboard.writeText(shareableLink)
       .then(() => {
-        enqueueSnackbar('Link copied to clipboard!', { variant: 'success' })
+        enqueueSnackbar('Link copied to clipboard!', { variant: 'success', autoHideDuration: 3000 })
       })
       .catch((error) => {
         enqueueSnackbar('Failed to copy link.', { variant: 'error' })
