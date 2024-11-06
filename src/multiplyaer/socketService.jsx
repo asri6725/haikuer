@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('https://4725-13-236-193-140.ngrok-free.app');
+const socket = io('ws://13.236.193.140:443');
 
 export function initializeSocket() {
   socket.connect();

@@ -5,9 +5,9 @@ from flask_cors import CORS
 from helper import generate_room_name
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins=["https://asri6725.github.io", "http://localhost:5173"])
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-CORS(app, resources={r"/*": {"origins": ["https://asri6725.github.io", "http://localhost:5173"]}})
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Store active rooms with their passwords
 rooms = {}
@@ -66,4 +66,4 @@ def handle_leave(data):
     socketio.emit('room-joined', {'message': f"{username} has left."}, to=room)
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=443, allow_unsafe_werkzeug=True)
