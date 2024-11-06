@@ -1,0 +1,11 @@
+[Unit]
+Description=Backend Service for Haikuer App
+After=network.target
+
+[Service]
+ExecStart=/home/ubuntu/haikuer/backend/backend.sh
+WorkingDirectory=/home/ubuntu/haikuer
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -5,7 +5,11 @@ SCRIPT="/home/ubuntu/haikuer/backend/serve.py"
 
 # Function to start the Python script in the background
 start_script() {
+<<<<<<< HEAD
     python $SCRIPT &
+=======
+    python3 $SCRIPT &
+>>>>>>> 0345d40 (changes made on the server)
     echo $! > backend_script.pid # Store the PID of the process
     echo "Script started with PID: $(cat backend_script.pid)"
 }
@@ -39,3 +43,7 @@ while true; do
     sleep 3600 # Wait one hour
     restart_script
 done
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0345d40 (changes made on the server)
