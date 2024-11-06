@@ -120,6 +120,7 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
           >
             Copy link to share
           </Anchor>
+          <p>Room-link: `${window.location.origin}/haikuer/?room_id=${roomId}&room_pw=${roomPassword}`</p>
           <Space h="xs" />
           <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
             {roomStatus.map((msg, index) => (
