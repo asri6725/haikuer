@@ -3,7 +3,7 @@ Description=Gunicorn Service for Haikuer App
 After=network.target
 
 [Service]
-ExecStart=gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:443 --keyfile=/etc/letsencrypt/live/api.haikuer.auguilin.com/privkey.pem --certfile=/etc/letsencrypt/live/api.haikuer.auguilin.com/fullchain.pem serve:app
+ExecStart=gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:80 serve:app
 WorkingDirectory=/home/ubuntu/haikuer/backend/
 Restart=always
 
