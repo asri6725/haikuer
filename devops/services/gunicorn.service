@@ -3,7 +3,7 @@ Description=Gunicorn Service for Haikuer App
 After=network.target
 
 [Service]
-ExecStart=gunicorn --worker-class eventlet -w 1 -b 0.0.0.0:80 serve:app
+ExecStart=gunicorn --worker-class eventlet -w 1 -b 127.0.0.1:5000 serve:app
 WorkingDirectory=/home/ubuntu/haikuer/backend/
 Restart=always
 
