@@ -9,8 +9,6 @@ Currently, two official plugins are available:
 
 
 ### ToDo:
-1. Setup a socket server for 2-3 player connection - done
+1. Setup a socket server for 2-3 player connection.
 2. Add title.
-3. Allow players to put their names - done
-4. Seperate single player and socket functionality - done
-5. Fix publishing the other buttons - done
+3. Allow players to put their names?
