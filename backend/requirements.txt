@@ -1,4 +1,0 @@
-gunicorn
-eventlet
-flask
-flask-socket
