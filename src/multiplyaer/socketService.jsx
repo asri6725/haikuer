@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('13.210.86.120:80');
+const socket = io('https://api.haikuer.auguilin.com');
 
 export function initializeSocket() {
   socket.connect();
