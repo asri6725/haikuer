@@ -3,9 +3,9 @@ import '../App.css'
 import '@mantine/core/styles.css'
 import { TextInput, Button, Container, Space } from '@mantine/core'
 import { syllable } from 'syllable'
-import socket from './socketService'
+import {getSocket} from './socketService'
 
-function MultiPlayer({roomId}){
+async function MultiPlayer({roomId}){
   const [text, setText] = useState('')
   const [currentLine, setCurrentLine] = useState(1)
   const [haiku, setHaiku] = useState([])
@@ -17,6 +17,16 @@ function MultiPlayer({roomId}){
   const [errorMsg, setErrorMsg] = useState('')
 
   const map_line_vowels = {1:5, 2:7, 3:5, 4:'no more'}
+
+  let socket = null
+
+  const initSock = async () => {
+    try {
+      socket = await getSocket();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   // Function to draw the haiku on the canvas
   const drawHaiku = () => {
@@ -41,6 +51,7 @@ function MultiPlayer({roomId}){
   }, [haiku])
 
   const addLine = () => {
+    if (!socket) initSock()
     if(text.trim()){
         if(!disableChecks){
             let count = syllable(text.toLocaleLowerCase())
@@ -77,11 +88,13 @@ function MultiPlayer({roomId}){
   }
 
   const cleanSlate = () => {
+    if (!socket) initSock()
     socket.emit('clean-slate', { room: roomId })
   }
 
   useEffect(() => {
-
+    if (!socket) return
+    
     socket.on('new-line', (data) => {
         setHaiku(data.haiku)
         let line = data.haiku.length + 1

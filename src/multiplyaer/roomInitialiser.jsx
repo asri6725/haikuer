@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { TextInput , Button, Title, Container, Space, Alert, Anchor } from '@mantine/core'
 import { useLocation } from 'react-router-dom'
-import socket from './socketService'
+import {getSocket} from './socketService'
 import { useSnackbar } from 'notistack'
 
 function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
@@ -9,8 +9,14 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
   const [roomPassword, setRoomPassword] = useState('')
   const [isInRoom, setIsInRoom] = useState(false)
   const [roomStatus, setRoomStatus] = useState([])
+  const [disableCreateRoom, setDisableCreateRoom] = useState(true);
+  const [disableJoinRoom, setDisableJoinRoom] = useState(true);
+
+  let socket = null
 
   useEffect(() => {
+
+    if (!socket) return;
 
     const queryParams = new URLSearchParams(location.search)
     if(queryParams.get('room_id') && queryParams.get('room_pw')){
@@ -45,17 +51,27 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
       socket.off('room-created')
       socket.off('room-joined')
     }
-  }, [])
+  }, [username, roomPassword, roomId])
 
-  const createRoom = () => {
-    if (roomPassword) {
-      socket.emit('create-room', { password: roomPassword })
+  const createRoom = async () => {
+    try{
+      if (roomPassword) {
+        if (!socket) socket = await getSocket()
+        socket.emit('create-room', { password: roomPassword })
+      }
+    } catch(error) {
+      console.log("Failed socket conn: ", error)
     }
   }
 
-  const joinRoom = () => {
-    if (roomId && roomPassword && username) {
-      socket.emit('join', { username, room: roomId, password: roomPassword })
+  const joinRoom = async () => {
+    try{
+      if (roomId && roomPassword && username) {
+        if (!socket) socket = await getSocket()
+        socket.emit('join', { username, room: roomId, password: roomPassword })
+      }
+    } catch(error) {
+      console.log("Failed socket conn: ", error)
     }
   }
 
@@ -84,25 +100,48 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
             type="text"
             placeholder="Enter Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {{setUsername(e.target.value)
+              if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() !== ''){
+                setDisableJoinRoom(false)
+              }
+              else if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() === ''){
+                setDisableCreateRoom(false)
+              }
+            }}}
           />
           <Space h="xs" />
           <TextInput 
             type="text"
             placeholder="Enter Room Password"
             value={roomPassword}
-            onChange={(e) => setRoomPassword(e.target.value)}
+            onChange={(e) => {{
+                            setRoomPassword(e.target.value)
+                            if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() !== ''){
+                              setDisableJoinRoom(false)
+                            }
+                            else if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() === ''){
+                              setDisableCreateRoom(false)
+                            }
+            }}}
           />
           <Space h="sm" />
-          <Button onClick={createRoom}>Create Room</Button>
+          <Button onClick={createRoom} disabled={disableCreateRoom}>Create new room</Button>
           <Space h="md" />
           <TextInput 
             type="text"
             placeholder="Enter Room ID to Join"
             value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
+            onChange={(e) => {{
+                            setRoomId(e.target.value)
+                            if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() !== ''){
+                              setDisableJoinRoom(false)
+                            }
+                            else if (username.trim() !== '' && roomPassword.trim() !== '' && roomId.trim() === ''){
+                              setDisableCreateRoom(false)
+                            }
+            }}}
           />
-          <Button onClick={joinRoom}>Join Room</Button>
+          <Button onClick={joinRoom} disabled={disableJoinRoom}>Join existing room</Button>
         </div>
       )}
       {isInRoom && (
@@ -120,7 +159,7 @@ function RoomInitialiser({ setRoomId, roomId, setIsMultiplayer }) {
           >
             Copy link to share
           </Anchor>
-          <p>Room-link: `${window.location.origin}/haikuer/?room_id=${roomId}&room_pw=${roomPassword}`</p>
+          <p>Room-link: `{window.location.origin}/haikuer/?room_id={roomId}&room_pw={roomPassword}`</p>
           <Space h="xs" />
           <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'scroll' }}>
             {roomStatus.map((msg, index) => (
